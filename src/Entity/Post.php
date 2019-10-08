@@ -34,6 +34,11 @@ class Post
     private $slug;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $preview;
+
+    /**
      * @ORM\Column(type="text")
      */
     private $body;
@@ -91,6 +96,18 @@ class Post
     public function setBody(string $body): self
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    public function getPreview(): ?string
+    {
+        return $this->preview;
+    }
+
+    public function setPreview(string $preview): self
+    {
+        $this->preview = $preview;
 
         return $this;
     }
