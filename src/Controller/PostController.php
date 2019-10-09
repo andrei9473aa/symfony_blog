@@ -3,30 +3,38 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Form\CommentType;
 use App\Form\PostType;
+use App\Repository\CommentRepository;
 use App\Repository\PostRepository;
+use Knp\Component\Pager\PaginatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/post")
- */
 class PostController extends AbstractController
 {
     /**
-     * @Route("/", name="post_index", methods={"GET"})
+     * @Route("posts/{page}", name="post_index", defaults={"page": 1}, requirements={"page": "\d+"}, methods={"GET"})
      */
-    public function index(PostRepository $postRepository): Response
+    public function index($page, PostRepository $postRepository, PaginatorInterface $paginator): Response
     {
+        $pagination = $paginator->paginate(
+            $postRepository->getPostsQueryBuilder(),
+            $page,
+            3
+        );
+
         return $this->render('post.html.twig', [
-            'posts' => $postRepository->findAll(),
+            'pagination' => $pagination,
         ]);
     }
 
     /**
-     * @Route("/new", name="post_new", methods={"GET","POST"})
+     * @Route("post/new", name="post_new", methods={"GET","POST"})
+     * @IsGranted("ROLE_POSTER")
      */
     public function new(Request $request): Response
     {
@@ -35,6 +43,10 @@ class PostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $post->setPreview('img/blog/1.jpg');
+            $post->setUser($this->getUser());
+
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($post);
             $entityManager->flush();
@@ -49,17 +61,24 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="post_show", methods={"GET"})
+     * @Route("post/{slug}", name="post_show", requirements={"post": "[a-z\-_\d]+"}, methods={"GET"})
      */
-    public function show(Post $post): Response
+    public function show(Post $post, CommentRepository $commentRepository): Response
     {
-        return $this->render('post/show.html.twig', [
+        $comments = $commentRepository->getCommentsByPostWithUsers($post);
+
+        $form = $this->createForm(CommentType::class);
+
+        return $this->render('post_single.html.twig', [
             'post' => $post,
+            'comments' => $comments,
+            'comment_form' => $form->createView()
         ]);
     }
 
     /**
-     * @Route("/{id}/edit", name="post_edit", methods={"GET","POST"})
+     * @Route("post/{id}/edit", name="post_edit", requirements={"post": "\d+"}, methods={"GET","POST"})
+     * @IsGranted("EDIT", subject="post")
      */
     public function edit(Request $request, Post $post): Response
     {
@@ -79,7 +98,8 @@ class PostController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="post_delete", methods={"DELETE"})
+     * @Route("post/{id}", name="post_delete", requirements={"post": "\d+"}, methods={"DELETE"})
+     * @IsGranted("DELETE", subject="post")
      */
     public function delete(Request $request, Post $post): Response
     {

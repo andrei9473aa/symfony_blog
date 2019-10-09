@@ -6,9 +6,18 @@ use App\Entity\Post;
 use App\Entity\User;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Security\Core\Security;
 
 class PostFixture extends BaseFixture implements DependentFixtureInterface
 {
+    private $security;
+
+    public function __construct(ObjectManager $manager, Security $security)
+    {
+        parent::__construct($manager);
+        $this->security = $security;
+    }
+
     public function load(ObjectManager $manager)
     {
         $previews = [
@@ -22,12 +31,28 @@ class PostFixture extends BaseFixture implements DependentFixtureInterface
             $post->setPreview($this->faker->randomElement($previews));
             $post->setBody($this->faker->text(900));
 
-            /** @var User $user */
-            $user = $this->getRandomReference('user');
-            $post->setUser($user);
+            $poster = $this->getRandomPoster();
+
+            $post->setUser($poster);
         });
 
         $manager->flush();
+    }
+
+    private function getRandomPoster() {
+        $isPoster = false;
+
+        while ($isPoster === false) {
+            /** @var User $user */
+            $user = $this->getRandomReference('user');
+            $roles = $user->getRoles();
+
+            if (in_array('ROLE_POSTER', $roles)) {
+                $isPoster = true;
+            }
+        }
+
+        return $user;
     }
 
     public function getDependencies()

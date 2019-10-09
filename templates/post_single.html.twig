@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <!-- Page top section -->
+    <section class="page-top-section set-bg" data-setbg="{{ asset('img/page-top-bg/1.jpg') }}">
+        <div class="page-info">
+            <h2>Games</h2>
+            <div class="site-breadcrumb">
+                <a href="">Home</a>  /
+                <span>Games</span>
+            </div>
+        </div>
+    </section>
+    <!-- Page top end-->
+
+
+    <!-- Games section -->
+    <section class="games-single-page">
+        <div class="container">
+            <div class="game-single-preview">
+                <img src="{{ asset(post.preview) }}" alt="">
+            </div>
+            <div class="row">
+                <div class="col-xl-9 col-lg-8 col-md-7 game-single-content">
+                    <div class="gs-meta">11.11.18  /  in <a href="">Games</a></div>
+                    <h2 class="gs-title">{{ post.title }}</h2>
+                    <h4>Gameplay</h4>
+                    <p>{{ post.body }}</p>
+                    <h4>Conclusion</h4>
+                    <p>{{ post.body }}</p>
+                    <div class="geme-social-share pt-5 d-flex">
+                        <p>Share:</p>
+                        <a href="#"><i class="fa fa-pinterest"></i></a>
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                        <a href="#"><i class="fa fa-dribbble"></i></a>
+                        <a href="#"><i class="fa fa-behance"></i></a>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-5 sidebar game-page-sideber">
+                    <div id="stickySidebar">
+                        <div class="widget-item">
+                            <div class="rating-widget">
+                                <h4 class="widget-title">Ratings</h4>
+                                <ul>
+                                    <li>Price<span>3.5/5</span></li>
+                                    <li>Graphics<span>4.5/5</span></li>
+                                    <li>Levels<span>3.5/5</span></li>
+                                    <li>Levels<span>4.5/5</span></li>
+                                    <li>Dificulty<span>4.5/5</span></li>
+                                </ul>
+                                <div class="rating">
+                                    <h5><i>Rating</i><span>4.5</span> / 5</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="widget-item">
+                            <div class="testimonials-widget">
+                                <h4 class="widget-title">Testimonials</h4>
+                                <div class="testim-text">
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolo re magna aliqua. Quis ipsum suspend isse ultrices.</p>
+                                    <h6><span>James Smith,</span>Gamer</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Games end-->
+
+    <section class="comments">
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <p>
+                    {{ form_start(comment_form, {action: path('comment_new', {id: post.id})}) }}
+                    {{ form_widget(comment_form) }}
+                    <button class="btn">{{ button_label|default('Save') }}</button>
+                    {{ form_end(comment_form) }}
+                </p>
+                {% for comment in comments %}
+                <div class="lc-item">
+                    <img src="{{ asset('img/blog-widget/1.jpg') }}" class="lc-avatar" alt="#">
+                    {% if is_granted('DELETE', comment) %}
+                        <form method="post" action="{{ path('comment_delete', {'id': comment.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                            <button class="btn">Delete</button>
+                        </form>
+                    {% endif %}
+                    <div class="tw-text"><a href="">{{ comment.user }}</a> {{ comment.body }} </div>
+                </div>
+                {% endfor %}
+            </section>
+
+            <section class="game-author-section">
+                <div class="container">
+                    <div class="game-author-pic set-bg" data-setbg="{{ asset('img/author.jpg') }}"></div>
+                    <div class="game-author-info">
+                        <h4>Written by: {{ post.user }}</h4>
+                        <p>Vivamus volutpat nibh ac sollicitudin imperdiet. Donec scelerisque lorem sodales odio ultricies, nec rhoncus ex lobortis. Vivamus tincid-unt sit amet sem id varius. Donec elementum aliquet tortor. Curabitur justo mi, efficitur sed eros alique.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

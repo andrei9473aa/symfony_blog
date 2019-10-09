@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
@@ -24,6 +25,8 @@ class Post
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank(message="please enter some title")
+     * @Assert\Length(max="255", maxMessage="too long title")
      */
     private $title;
 
@@ -40,6 +43,7 @@ class Post
 
     /**
      * @ORM\Column(type="text")
+     * @Assert\NotBlank(message="Put some text to your blog")
      */
     private $body;
 

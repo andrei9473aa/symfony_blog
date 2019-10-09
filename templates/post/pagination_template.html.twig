@@ -1,0 +1,47 @@
+{#
+/**
+ * @file
+ * Twitter Bootstrap v4-beta.2 Sliding pagination control implementation.
+ *
+ * View that can be used with the pagination module
+ * from the Twitter Bootstrap CSS Toolkit
+ * https://getbootstrap.com/docs/4.0/components/pagination/
+ *
+ */
+#}
+{% if pageCount > 1 %}
+    <div class="site-pagination">
+
+            {% if startPage > 1 %}
+                <a href="{{ path(route, query|merge({(pageParameterName): 1})) }}">01.</a>
+                {% if startPage == 3 %}
+                    <a href="{{ path(route, query|merge({(pageParameterName): 2})) }}">02.</a>
+                {% elseif startPage != 2 %}
+                    <a href="#" style="pointer-events: none">&hellip;</a>
+                {% endif %}
+            {% endif %}
+
+            {% for page in pagesInRange %}
+                {% set viewPage = page ~ '.' %}
+                {% if page <= 9 %}
+                    {% set viewPage = 0 ~ viewPage %}
+                {% endif %}
+                {% if page != current %}
+                    <a href="{{ path(route, query|merge({(pageParameterName): page})) }}">{{ viewPage }}</a>
+                {% else %}
+                    <a href="#" class="active" style="pointer-events: none">{{ viewPage }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if pageCount > endPage %}
+                {% if pageCount > (endPage + 1) %}
+                    {% if pageCount > (endPage + 2) %}
+                        <a href="#" style="pointer-events: none">&hellip;</a>
+                    {% else %}
+                        <a href="{{ path(route, query|merge({(pageParameterName): (pageCount - 1 )})) }}">{{ pageCount -1 ~ '.' }}</a>
+                    {% endif %}
+                {% endif %}
+                <a href="{{ path(route, query|merge({(pageParameterName): pageCount })) }}">{{ pageCount ~ '.'}}</a>
+            {% endif %}
+    </div>
+{% endif %}

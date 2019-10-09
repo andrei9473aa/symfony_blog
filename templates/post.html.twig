@@ -26,24 +26,20 @@
                         <li><a href="#">Online</a></li>
                     </ul>
 
-                    {% for post in posts %}
+                    {% for post in pagination %}
                     <div class="big-blog-item">
                         <img src="{{ asset(post.preview) }}" alt="#" class="blog-thumbnail">
                         <div class="blog-content text-box text-white">
                             <div class="top-meta">{{ post.createdAt|date('d.m.y') }}  /  in <a href="">Games</a></div>
                             <h3>{{ post.title }}</h3>
                             <p>{{ post.body|slice(0, 286) ~ '.....' }}</p>
-                            <a href="#" class="read-more">Read More <img src="{{ asset('img/icons/double-arrow.png') }}" alt="#"/></a>
+                            <a href="{{ path('post_show', {slug: post.slug}) }}" class="read-more">Read More <img src="{{ asset('img/icons/double-arrow.png') }}" alt="#"/></a>
                         </div>
                     </div>
                     {% endfor %}
 
                     {% block pagination %}
-                    <div class="site-pagination">
-                        <a href="#" class="active">01.</a>
-                        <a href="#">02.</a>
-                        <a href="#">03.</a>
-                    </div>
+                        {{ knp_pagination_render(pagination) }}
                     {% endblock %}
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-5 sidebar">
